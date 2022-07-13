@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewData["Title"] = "SignUp";
+    Layout = "~/Views/Shared/_AuthenLayout.cshtml";
+}
+
+    <form class="form-container" method="POST" action="/Auth/SignUp" enctype="application/x-www-form-urlencoded">
+        <ul class="form">
+            <a href="/home/index" class="close material-symbols-outlined">
+            close
+            </a>
+            <li class="items-group">
+                <h1>Đăng ký</h1>
+            </li>
+            <li class="items-group d-none">
+                <div class="error">                   
+                </div>
+            </li>
+            <li class="items-group">
+                <label>Username</label>
+                <div class="items">
+                    <span class="icons material-symbols-outlined">person</span>
+                    <input name="Name" id="username" type="text" placeholder="Nhập tên của bạn">
+                </div>
+            </li>
+            <li class="items-group">
+                <label>Email</label>
+                <div class="items">
+                    <span class="icons material-symbols-outlined">alternate_email</span>
+                    <input  id="email" type="text" placeholder="Nhập email của bạn">
+                </div>
+            </li>
+            <li class="items-group">
+                <label>Pasword</label>
+                <div class="items">
+                    <span class="icons material-symbols-outlined">lock</span>
+                    <input id="password" type="password" placeholder="Nhập password của bạn">
+                </div>
+            </li>
+            <li class="items-group">
+                <label>Confirm Password</label>
+                <div class="items">
+                    <span class="icons material-symbols-outlined">lock</span>
+                    <input  id="confirm-password" type="password" placeholder="Nhập lại password của bạn">
+                </div>
+            </li>
+            <li class="items-group">
+                <div class="items">
+                    <input type="button" value="Đăng ký"name="submit" id="submit-btn">
+                </div>
+            </li>
+        </ul>
+    </form>
+
+<script>
+    $(function(){
+        let data = {};
+        $("#submit-btn").click(function(event){
+            event.preventDefault();
+            data.Username = $("#username").val().trim();
+            data.Email = $("#email").val();
+            data.Password = $("#password").val().trim();
+            data.ConfirmPassword = $("#confirm-password").val().trim();
+       
+            $.ajax({
+            async:true,
+            url: "/Auth/Signup",
+            //processData: false,
+            contentType:"application/json",
+            method:"post",
+            data: JSON.stringify(data),  
+            success: function (data) {
+                console.log(data);
+                if(!data.isSuccess){                    
+                    const error = document.querySelector(".error");
+                    error.parentElement.classList.contains("d-none")?
+                        error.parentElement.classList.toggle("d-none"):"";
+                    error.innerHTML = "";
+                    if(data.errors){
+                        for(let i = 0; i< data.errors.length;i++){
+                            error.innerHTML +='<div class="error-item">'+data.errors[i]+'</div>';
+                        }
+                    }
+                    else{
+                        error.innerHTML +='<div class="error-item">'+data.message+'</div>';
+                    }
+                }else{
+                    location.href = "/home/index";
+                }
+            },
+            error: function (data) {
+                console.log('An error occurred.');
+                console.log(data);
+            },
+        });           
+
+    })
+    })
+</script>
+

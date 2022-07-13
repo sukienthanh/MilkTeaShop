@@ -1,0 +1,77 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+ 
+ <div class="table-data">
+      <div class="action-btn">
+        <button id="add-btn" class="btn btn-dangerous">
+            <span class="material-symbols-outlined">playlist_add</span>
+            Thêm mới
+        </button>            
+        <button id="refresh-btn" class="btn btn-info">
+            <span class="material-symbols-outlined">
+            autorenew
+            </span>
+            Refresh
+        </button>
+   </div> 
+   <div id="grid"></div>
+ </div>
+
+<script>
+    //add active class
+     $("#sidebar").find(".nav-item.active")[0].classList.toggle("active");
+     $("#sidebar #catalog")[0].classList.toggle("active");
+    //var listCatalog = new DevExpress.data.CustomStore({
+    //    key: "catalogId",
+    //    loadMode:"raw",
+    //    load: function () {
+    //        var d = $.Deferred();
+    //        $.ajax({
+    //            "async": true,
+    //            "crossDomain": true,
+    //            "url": "@Url.Action("GetList", "Catalog")",
+    //            "headers": {
+    //                "Content-Type": "application/json",
+    //                "cache-control": "no-cache"
+    //            },
+    //            "method": "GET"
+    //        }).done(function (result) {
+    //            d.resolve(result);
+    //        }).fail(function (xhr) {
+    //            console.log("failed");
+    //        });
+    //        return d.promise();
+    //    }
+    //});
+    var table = "Catalog"
+    idName = "cataId";
+
+    var columns = [{  
+        width: "0%",
+        caption: "Catalog ID",
+        dataField: "cataId",
+        visible: false,
+        allowEditing: false,
+    }, {
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "40%",
+        caption: "Catalog Name",
+        dataField: "cataName",
+        validationRules: [{
+            type: "required",
+            message: "Catalog Name field is required"
+        }]
+    }];
+</script>
+<script src="~/asset/javascript/initTable.js"></script>
+<script>
+    dataGrid.columnOption("modifiedDate", "visible", true);
+    dataGrid.columnOption("createdDate", "visible", true);
+    dataGrid.columnOption("createdBy", "visible", true);
+    dataGrid.columnOption("modifiedBy", "visible", true);
+    $(function () {
+        $(".breadcrumb #breadcrumb-change").text("Phân loại sản phẩm");
+    })
+</script>

@@ -1,0 +1,232 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+ 
+ <div class="table-data">
+      <div class="action-btn">
+        <button id="add-btn" class="btn btn-dangerous">
+            <span class="material-symbols-outlined">playlist_add</span>
+            Thêm mới
+        </button>            
+        <button id="refresh-btn" class="btn btn-info">
+            <span class="material-symbols-outlined">
+            autorenew
+            </span>
+            Refresh
+        </button>
+   </div> 
+   <div id="grid"></div>
+ </div>
+
+<script>
+    //add active class
+     $("#sidebar").find(".nav-item.active")[0].classList.toggle("active");
+     $("#sidebar #order")[0].classList.toggle("active");
+    //var listCatalog = new DevExpress.data.CustomStore({        
+    //    key: "id",          
+    //    load: function () {
+    //        var d = $.Deferred();
+    //        $.ajax({                
+    //            "async": true,
+    //            "crossDomain": true,
+    //            "url": "/orderitem/getlist",
+    //            "headers": {
+    //                "Content-Type": "application/json",
+    //                "cache-control": "no-cache"
+    //            },
+    //            "method": "GET"
+    //        }).done(function (result) {
+    //            d.resolve(result);
+    //        }).fail(function (xhr) {
+    //            console.log("failed");
+    //        });
+    //        return d.promise();
+    //    },
+    //     byKey: function (key) {
+    //        var d = new $.Deferred();
+    //        $.get("/catalog/getbyid?id=" + key)
+    //            .done(function (dataItem) {
+    //                d.resolve(dataItem.data);
+    //            });
+    //        return d.promise();
+    //    }
+    //});
+    const orderItemStore = new DevExpress.data.CustomStore({
+            
+            load: function (loadOptions) {
+                var d = $.Deferred();
+                $.ajax({
+                    url: "/orderitem/getlist",
+                    method: 'get',
+                    dataType: 'json',
+                    crossDomain: true,
+                    headers: {
+                        "Content-Type": 'application/json',
+                        "cache-control": "no-cache"
+                    },
+                }).done(function (e) {
+                    d.resolve(e);
+                }).fail(function (jqXhr, status, message) {
+                    d.reject();
+                    console.log(status + ": " + message);
+                });
+                return d.promise();
+            }
+        })
+    var table = "Order",
+    idName = "id";
+
+    var columns = [{  
+        width: "0%",
+        caption: "Order ID",
+        dataField: "id",
+        visible: false,
+        allowEditing: false,
+    }, {
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "30%",
+        caption: "Phí ship vn₫",
+        dataField: "shippingCost",
+        validationRules: [{
+            type: "required",
+            message: "shippingCost field is required"
+        }]
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Tổng tiền(vn₫)",
+        dataField: "totalAmount",        
+        format: ' #,##0 ₫',
+        editorOptions:{ format: ' #,##0 ₫', showClearButton: true }, 
+        validationRules: [{
+            type: "required",
+            message: "totalAmount  field is required"
+        }]
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "10%",
+        caption: "Giảm giá (vnd)",
+        format: ' #,##0 ₫',
+        editorOptions:{ format: ' #,##0 ₫', showClearButton: true },  
+        dataField: "discountAmount",
+        dataType:"number",
+        
+        
+    }, {
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Tên khách hàng",             
+        dataField: "customerName",
+        validationRules: [{
+            type: "required",
+            message: "Tên khách hàng bắt buộc phải nhập!"
+        }]
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Số điện thoại",
+        dataField: "customerPhone",
+        validationRules: [{
+            type: "required",
+            message: "Số điện thoại khách hàng bắt buộc phải nhập!"
+        }],
+        
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Địa chỉ khách hàng",
+        dataField: "customerAddress",
+        validationRules: [{
+            type: "required",
+            message: "Địa chỉ khách hàng bắt buộc phải nhập!"
+        }],
+        
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Ghi chú đơn hàng",
+        dataField: "OrderNote"       
+        
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Trạng thái đơn hàng",
+        dataField: "status"           
+    }];
+</script>
+<script src="~/asset/javascript/initTable.js"></script>
+<script>
+    var edit = {
+        mode: "popup",
+        popup: {
+            title: "Đơn hàng",
+            showTitle: true
+        }
+    };   
+    let masterDetail = {
+      enabled: true,
+      template(container, options) {
+        const currentData = options.data;
+
+        $('<div>')
+          .dxDataGrid({
+            columnAutoWidth: true,
+            showBorders: true,
+            columns:[{
+                caption:"Tên sản phẩm",
+                dataField:"product.productName",
+            },{
+                caption:"Số lượng",
+                dataField:"quantity",
+            },{
+                caption:"Đơn giá",
+                dataField:"product.price",
+            },{
+                caption:"Giá giảm ",
+                dataField:"product.discount",
+            },{
+                caption:"Thành tiền",
+                calculateCellValue(data){
+                    return (data.product.price - data.product.discount)*data.quantity;
+                }
+            },{
+                caption:"Ghi chú",
+                dataField:"note",
+            }],
+            summary: {
+                  totalItems: [{
+                    displayFormat:"Số lượng: {0}",
+                    column: 'product.productName',
+                    summaryType: 'count',
+                  }, {
+                    valueFormat: ' #,##0 ₫',
+                    displayFormat: 'Tổng cộng:  {0}',
+                    column: 'Thành tiền',
+                    summaryType: 'sum',                    
+                  }],
+                },
+            dataSource: new DevExpress.data.DataSource({
+              store: orderItemStore,
+              filter: ['orderId', '=', options.key.id],
+            }),
+          }).appendTo(container);
+      },
+    };
+    dataGrid.option("editing",edit);
+    dataGrid.option("masterDetail",masterDetail);
+    dataGrid.columnOption("modifiedDate", "visible", false);
+    dataGrid.columnOption("createdDate", "visible", false);
+    dataGrid.columnOption("createdBy", "visible", false);
+    dataGrid.columnOption("modifiedBy", "visible", false);
+    $(function () {
+        $(".breadcrumb #breadcrumb-change").text("Đơn đặt hàng");
+    })
+</script>

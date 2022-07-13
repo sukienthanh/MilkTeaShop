@@ -1,0 +1,208 @@
+﻿@{
+    Layout = "_AdminLayout";
+}
+ 
+ <div class="table-data">
+      <div class="action-btn">
+        <button id="add-btn" class="btn btn-dangerous">
+            <span class="material-symbols-outlined">playlist_add</span>
+            Thêm mới
+        </button>            
+        <button id="refresh-btn" class="btn btn-info">
+            <span class="material-symbols-outlined">
+            autorenew
+            </span>
+            Refresh
+        </button>
+   </div> 
+   <div id="grid"></div>
+ </div>
+
+<script>
+    //add active class
+     $("#sidebar").find(".nav-item.active")[0].classList.toggle("active");
+     $("#sidebar #product")[0].classList.toggle("active");
+    var listCatalog = new DevExpress.data.CustomStore({        
+        key: "cataId",          
+        load: function () {
+            var d = $.Deferred();
+            $.ajax({                
+                "async": true,
+                "crossDomain": true,
+                "url": "/catalog/getlist",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "cache-control": "no-cache"
+                },
+                "method": "GET"
+            }).done(function (result) {
+                d.resolve(result);
+            }).fail(function (xhr) {
+                console.log("failed");
+            });
+            return d.promise();
+        },
+         byKey: function (key) {
+            var d = new $.Deferred();
+            $.get("/catalog/getbyid?id=" + key)
+                .done(function (dataItem) {
+                    d.resolve(dataItem.data);
+                });
+            return d.promise();
+        }
+    });
+    var table = "Product",
+    idName = "productId";
+
+    var columns = [{  
+        width: "0%",
+        caption: "Product ID",
+        dataField: "productId",
+        visible: false,
+        allowEditing: false,
+    }, {
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "30%",
+        caption: "Product Name",
+        dataField: "productName",
+        validationRules: [{
+            type: "required",
+            message: "Product Name field is required"
+        }]
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Phân loại",
+        dataField: "catalogId",        
+        lookup: {
+            dataSource: listCatalog,
+                displayExpr:"cataName",
+                valueExpr:"cataId"
+                // Other DataSource properties go here            
+            },
+        validationRules: [{
+            type: "required",
+            message: "Catalog  field is required"
+        }]
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "10%",
+        caption: "Giảm giá %",
+        format: '##0 %',
+        editorOptions:{ format: '##0 %', showClearButton: true },
+        dataField: "discount",
+        dataType:"number",
+        
+        
+    }, {
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Giá ₫",
+        format: ' #,##0 ₫',
+        editorOptions:{ format: ' #,##0 ₫', showClearButton: true },         
+        dataField: "price",
+        validationRules: [{
+            type: "required",
+            message: "Giá sản phẩm bắt buộc phải nhập!"
+        }]
+    },{
+        allowFixing: true,
+        allowHiding: true,
+        minWidth: "20%",
+        caption: "Hình ảnh",
+        dataField: "image",
+        validationRules: [{
+            type: "required",
+            message: "Giá sản phẩm bắt buộc phải nhập!"
+        }],
+        //cellTemplate(container, options) {
+        //    $('<div class="preview-img">')
+        //        .append($('<img>', { src: options.value }))
+        //        .appendTo(container);
+        //}
+    }];
+</script>
+<script src="~/asset/javascript/initTable.js"></script>
+<script>
+    var edit = {
+    mode: "popup",
+    popup: {
+        title: "Sản phẩm",
+        showTitle: true
+    },
+    form: {
+        colCount: 1,
+        items: [{
+            colCount: 2,
+            itemType: "group",
+            items: ["productId", "productName", "catalogId", "discount", "price","image"],
+        }, {
+            itemType: "Empty"
+        }, {
+            colCount: 2,
+            itemType: "group",
+            items: ["createdDate", "modifiedDate", "createdBy", "modifiedBy"]
+        }, {
+            colCount: 1,
+            itemType: "group",
+            items: [{
+                template: function(data, itemElement) {
+                    itemElement.append(
+                        $('<form id="upload" enctype="multipart/form-data">').dxFileUploader({
+                            selectButtonText: 'Select photo',
+                            labelText: '',
+                            accept: 'image/*',
+                            uploadMode: 'useForm',
+                            onValueChanged(e) {
+                                //let file = e.element[0].querySelector("input");
+                                document.querySelector("#upload input").name = "file"
+                                //let formData = new FormData();
+                                //formData.append("files[]",file)
+                                var formData = new FormData(document.getElementById('upload'));
+                               
+                                $.ajax({               
+                                    "url": "/filemanager/uploadfile",
+                                    contentType: false,
+                                    processData: false, 
+                                    enctype: 'multipart/form-data',
+                                    data:formData,
+                                    dataType: "json",
+                                    type: "post"
+                                }).done(function (result) {
+                                   if(result.status){
+                                    dataGrid.option('editing').changes = 
+                                    [{
+                                        "data": {
+                                            "image": result.data,
+                                        },
+                                        "key":dataGrid.option("editing").editRowKey,
+                                        "type": "update"
+                                    }];                                    
+                                    document.querySelectorAll(".dx-item.dx-box-item input")[9].value =result.data;
+                                }else{
+                                    DevExpress.ui.notify("File alred", "warning", 2000);
+                                }
+                                }).fail(function (xhr) {
+                                    console.log("upload image failed");
+                                });
+                            }                        
+                        })
+                    )
+                }
+            }]
+        }]
+    },
+};     
+    dataGrid.option("editing",edit);
+    dataGrid.columnOption("modifiedDate", "visible", false);
+    dataGrid.columnOption("createdDate", "visible", false);
+    dataGrid.columnOption("createdBy", "visible", false);
+    dataGrid.columnOption("modifiedBy", "visible", false);
+    $(function () {
+        $(".breadcrumb #breadcrumb-change").text("Sản phẩm");
+    })
+</script>

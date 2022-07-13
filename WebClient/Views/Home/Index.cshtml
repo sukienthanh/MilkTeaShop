@@ -1,0 +1,740 @@
+﻿@{
+    ViewData["Title"] = "Bụi Tea";
+}
+<div id="cart-popup"></div>
+<div id="child-popup" class="child-popup d-none"></div>
+<div id="edit-popup" class="d-none"></div>
+@*<div class="child-popup">    
+    <div class="popup customer-info">
+        <div class="title"><span class="close material-symbols-outlined">arrow_back</span> Thông tin khách hàng </div>
+        <div class="info-form">
+            <div class="form-group username">
+                <div class="label">Tên người nhận</div>
+                <input placeholder="Tên người nhận"/>
+            </div>
+            <div class="form-group phone-number">
+                <div class="label">Số điện thoại</div>
+                <input placeholder="Số điện thoại"/>
+            </div>
+            <div class="form-group address">
+                <div class="label">Địa chỉ</div>
+                <input placeholder="Địa chỉ nhận hàng, số nhà, tên đường,..."/>
+            </div>
+        </div>
+        <div id="save-user-info"><button class="btn btn-warning">Xác nhận</button></div>
+    </div>
+</div>*@
+<section class="row">
+        <div class="header-info">
+            <div class="restaurant-img">
+                <img src="/asset/img/banner_blue.jpg">
+            </div>
+            <div class="restaurant-info">               
+                <div class="restaurant-kind">
+                    <i class="fa-solid fa-tag"></i>
+                    <div class="kind">CAFÉ/DESSERT</div>
+                </div>
+                <div class="restaurant-name">
+                    <h3>Bụi Tea</h3>
+                </div>
+                <div class="restaurant-location">
+                    <i class="fa-solid fa-location-dot"></i> 93 Nguyễn Văn Tiết, Hiệp Thành, Thủ Dâu Một, Bình Dương
+                </div>
+                <div class="restaurant-rating">
+                    <div class="stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div class="rating-number">999+</div>
+                </div>
+                <div class="restaurant-status">
+                    <i class="fa-solid fa-circle"></i>
+                    <div class="status">Mở cửa</div>
+                    <div class="open-time">
+                        <span class="material-symbols-outlined">
+                        schedule
+                    </span>
+                        <div class="open">10:15</div>
+                        <i class="fa-solid fa-minus"></i>
+                        <div class="close">21:30</div>
+                    </div>
+                </div>
+                <div class="restaurant-cost">
+                    <i class="fa-solid fa-receipt"></i>
+                    <div class="min">10,000</div>
+                    <i class="fa-solid fa-minus"></i>
+                    <div class="max">60,000</div>
+                </div>
+            </div>
+        </div>
+</section>
+<section class="row product">
+    <ul class="col col-md-70 product-list">
+            
+        <li class="item">
+            <div class="item-img"><img src="asset/img/bui_3.jpg"></div>
+            <div class="item-name">Trà sữa trân châu truyền thống</div>
+            <span class="item-price"> 25.000 đ</span>
+            <span class="add-icon material-symbols-outlined">add_circle</span>
+        </li>           
+    </ul>
+    <div class="col col-md-30">
+        <div class="order-card">
+            <div class="card-item card-text">
+                <span>Món bạn đã chọn</span>
+                <span class="remove-cart material-symbols-outlined">
+                delete
+            </span>
+            </div>
+            <ul class="card-item card-body">
+                <li class="item">
+                    <div class="item-info">
+                        <span class="item-name">Trà sữa trân châu đường đen</span>
+                        <span class="quantity">1</span>
+                        <span class="material-symbols-outlined">
+                        border_color
+                    </span>
+                    </div>
+                    <div class="item-price">
+                        176.000 đ
+                    </div>
+                </li>
+                <li class="item">
+                    <div class="item-info">
+                        <span class="item-name">Trà sữa trân châu đường đen</span>
+                        <span class="quantity">1</span>
+                        <span class="material-symbols-outlined">
+                        border_color
+                    </span>
+                    </div>
+                    <div class="item-price">
+                        176.000 đ
+                    </div>
+                </li>
+                <li class="item">
+                    <div class="item-info">
+                        <span class="item-name">Trà sữa trân châu đường đen</span>
+                        <span class="quantity">1</span>
+                        <span class="material-symbols-outlined">
+                        border_color
+                    </span>
+                    </div>
+                    <div class="item-price">
+                        176.000 đ
+                    </div>
+                </li>
+                <li class="item">
+                    <div class="item-info">
+                        <span class="item-name">Trà sữa trân châu đường đen</span>
+                        <span class="quantity">1</span>
+                        <span class="material-symbols-outlined">
+                        border_color
+                    </span>
+                    </div>
+                    <div class="item-price">
+                        176.000 đ
+                    </div>
+                </li>
+            </ul>
+            <div class="card-item action-container">
+                <div class="total-price">
+                    <span>Thành tiền</span>
+                    <span id="total-price"> 176.000 đ</span>
+                </div>
+                <button id="pay-btn">Thanh toán</button>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+   let productList= [],
+        order = {},
+        distance = 0;
+    //get product list 
+    $(function(){
+        $.ajax({                
+            "async": true,
+            "crossDomain": true,
+            "url": "/product/getlist",
+            "headers": {
+                "Content-Type": "application/json",
+                "cache-control": "no-cache"
+            },
+            "method": "GET"
+        }).done(function (result) {
+            if(result.status){
+                productList = result.data;
+                renderData(productList);
+            }
+        }).fail(function (xhr) {
+            console.log("get list product failed");
+        });
+        renderCartBody();
+        //remove cart action
+        document.querySelector(".remove-cart").addEventListener("click",removeCart);
+    });
+    //set show popup event
+    document.getElementById("nav__cart-icon").addEventListener("click",showCartPopup);
+    //show cart poup function
+    function showCartPopup(){
+        //target for render popup
+        let popupContainer = document.getElementById("cart-popup");
+        if(popupContainer.classList.contains("d-none"))
+            popupContainer.classList.toggle("d-none");
+        if(popupContainer.innerHTML === ""){  
+            let popup =  '<div class="popup-container">'+
+            '<div class="popup">'+
+                '<span class="close x-close material-symbols-outlined">'+
+                    'close'+
+                '</span>'+
+            '<div class="checkout-info">'+
+                '<div class="checkout-item title">'+
+                    '<span class="close material-symbols-outlined">'+
+                    'arrow_back'+
+                '</span>'+
+                    '<h3>Thông tin giỏ hàng</h3>'+
+                '</div>'+
+                '<div class="checkout-item ship">'+
+                    '<button class="btn ">Giao hàng</button>'+
+                    '<button class="btn active">Tự lấy</button>'+
+                '</div>'+
+                '<div class="checkout-item address">'+
+                    '<div class="icon-group">'+
+                        '<div class="node">'+
+                            '<div></div>'+
+                        '</div>'+
+                        '<i class="to fa-solid fa-circle"></i>'+
+                    '</div>'+
+                    '<div class="content-group">'+
+                        '<div class="shop-address order">'+                        
+                            '<span class="title">BỤI TEA</span>'+
+                            '<div class="location">93 Nguyễn Văn Tiết, Hiệp Thành, Thủ Dầu Một, Bình Dương.</div>'+
+                        '</div>'+
+                        '<div class="customer-address">'+
+                        
+                            '<div>'+
+                                '<span class="title">Thông tin khách hàng</span>'+
+                                '<span class="edit-icon customer-info-edit material-symbols-outlined"> border_color</span>'+
+                            '</div>'+
+                            '<div class="location"></div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+                '<div class="checkout-item payment">'+
+                    '<div class="title">'+
+                        '<h4>Phương thức thanh toán</h4>'+
+                        '<span class="edit-icon pay-method-edit material-symbols-outlined">'+
+                    'border_color'+
+                '</div>'+
+                '<div class="method">Tiền mặt</div>'+
+            '</div> '+
+            '<div class="checkout-item order-card">'+
+                '<h3>Món Đã chọn</h3>'+
+                '<ul class="card-item card-body">'+                       
+                '</ul>'+
+                '</div>'+
+                '<div class="checkout-item note">'+
+                    '<textarea placeholder="Ghi chú cho đơn hàng: ví dụ, giao nhanh giúp tôi..."></textarea>'+
+                '</div>'+
+            '</div>'+
+            '<div class="checkout-action">'+
+                '<div class="product-cost">'+
+                    '<div class="quantity">Tổng cộng: </div>'+
+                    '<span class="money">0đ</span>'+
+                '</div>'+
+                '<div class="ship-cost">'+
+                    '<div class="title">Phí vận chuyển(km)</div>'+
+                    '<span class="money">0đ</span>'+
+                '</div>'+
+                '<div class="total">'+
+                    '<div class="title">Tiền phải thanh toán </div>'+
+                    '<span class="money">0đ</span>'+
+                '</div>'+
+                '<button id="order">Đặt hàng</button>'+
+            '</div>'+
+            '</div>'+
+        '</div>';
+    
+        document.getElementById("cart-popup").innerHTML += popup;
+        //render body-cart
+        renderCartBody(null);
+        //set event close ppopupp for close btns
+        let closeBtn = document.querySelectorAll(".popup .close");
+        closeBtn.forEach(function(value, index) {
+            value.addEventListener("click", function() {
+                popupContainer.classList.toggle("d-none");
+            });
+        });        
+        }
+        //set event for edit user info btn
+        document.querySelector(".customer-info-edit").addEventListener("click",changeCusomterInfo);
+        //set event for shipping method
+        const shippingParentNode = document.querySelector(".checkout-item.ship");
+        const addressParentNode = document.querySelector(".checkout-item.address .content-group");
+        shippingParentNode.childNodes.forEach((value, index)=>{
+            value.addEventListener("click",()=>{
+                if(!value.classList.contains("active")){
+                    addressParentNode.children[0].classList.toggle("order");
+                    addressParentNode.children[1].classList.toggle("order");
+                    shippingParentNode.firstChild.classList.toggle("active");
+                    shippingParentNode.lastChild.classList.toggle("active");                    
+                }
+            });
+        });
+    }
+    //show child popup     
+    function showChildPopup(productId, product = null){
+        childPopup = document.getElementById("child-popup");
+        if(childPopup.classList.contains("d-none"))
+            childPopup.classList.toggle("d-none");
+        product = product === null?  productList.find(x=>x.productId === 1*productId):product;
+        let popup =  '<div class="popup product-order">'+
+            '<span class="close order-close material-symbols-outlined">'+
+                'close'+
+            '</span>'+
+            '<div class="product-banner">'+
+                '<div class="product-info">'+
+                    '<div class="product-name">'+product.productName+'</div>'+
+                    '<div classs="product-item">Giá: <span>'+product.price+'đ</span></div>'+
+                '</div>'+
+            '</div>'+
+            '<div class="scroll">'+
+                '<div class="product-attach">'+
+                    '<div class="go-with">'+
+                        '<div class="title">Topping thêm</div>'+
+                        '<ul class="topping-group">'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Thạch pudding trứng</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Thạch pudding trứng</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Full topping</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                            '<li class="item">'+
+                                '<input class="checkbox" type="checkbox">'+
+                                '<div class="topping-info">'+
+                                    '<span class="name">Thạch pudding trứng</span>'+
+                                    '<span class="price">10.000đ</span>'+
+                                '</div>'+
+                            '</li>'+
+                        '</ul>'+
+                    '</div>'+
+                    '<div class="note">'+
+                        '<textarea placeholder="Ghi chú: ít đá, ít ngọt,..."></textarea>'+
+                    '</div>'+
+                    '<div class="action-group">'+
+                        '<ul class="quantity-control">'+
+                            '<li class="sub">'+
+                                '<span class="material-symbols-outlined">'+
+                                'remove'+
+                            '</span>'+
+                            '</li>'+
+                            '<div class="quantity">1</div>'+
+                            '<li class="plus">'+
+                                '<span class="material-symbols-outlined">'+
+                                'add'+
+                            '</span>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<div class="action-btn">'+
+                            '<button id="add-to-cart" class="btn btn-warning">Thêm vào giỏ</button>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'+
+            '</div>'+
+        '</div>';
+        childPopup.innerHTML = popup;
+        //set event for quantity control btn
+        quantityControl();
+        //set even to btn add to session cart
+        document.getElementById("add-to-cart").addEventListener("click",function(){
+            const quantity =  document.querySelector(".popup.product-order .quantity").innerHTML;
+            addToCart(product,quantity);
+        });
+        //set event close ppopupp for close btns
+        let closeBtn = document.querySelectorAll(".child-popup .popup .close");
+        closeBtn.forEach(function(value, index) {
+            value.addEventListener("click", function() {
+                childPopup.classList.toggle("d-none");
+            });
+        });
+    }
+    //render product grid
+    function renderData(productList){
+        if(productList){
+            let target = document.getElementsByClassName("product-list")[0];
+            target.innerHTML = "";
+            productList.forEach((value,index)=>{
+                let item = '<li class="item" id="'+value.productId+'">'+
+                        '<div class="item-img"><img src="'+value.image+'"></div>'+
+                        '<div class="item-name">'+value.productName+'</div>'+
+                        '<span class="item-price"> '+value.price+' đ</span>'+
+                        '<span class="add-icon material-symbols-outlined">'+
+                            'add_circle'+
+                        '</span>'+
+                        '</li>';
+                target.innerHTML += item;     
+                
+            });            
+            target.childNodes.forEach(function(value,index){
+                value.addEventListener("click",function(){                      
+                showChildPopup(value.id);
+                });
+            })
+        }
+    }
+    //modify product and save to session cart
+    function addToCart(product,quantity){
+        $.ajax({
+            method:"post",
+            url: "/cart/modify",            
+            "async": true,
+            data:JSON.stringify([{
+                'Product':product,
+                'Quantity':quantity
+            }]),
+            "crossDomain": true,            
+            "headers": {
+                "Content-Type": "application/json",
+                "cache-control": "no-cache"
+            },
+           
+        }).done(function (result) {
+            if(result.status){
+                cartList = result.data;      
+                renderCartBody(cartList);
+                document.getElementById("child-popup").classList.toggle("d-none");
+            }
+        }).fail(function (xhr) {
+            console.log("add to session cart failed");
+        });
+    }
+    //render cart body
+    function  renderCartBody(data){
+        if(data){
+            //render to            
+            let cartBody = document.querySelectorAll(".order-card .card-item.card-body");           
+            //cart not empty
+            if(data.length>0){
+                cartBody.forEach((item, index)=>{                    
+                    item.innerHTML = "";
+                    data.forEach(function(value,index){
+                        let html = //<ul class="card-item card-body">
+                        '<li class="item">'+
+                            '<div class="item-info">'+
+                                '<span  class="item-name">'+value.product.productName+'</span>'+
+                                '<span class="quantity">'+value.quantity+'</span>'+
+                                '<span class="edit material-symbols-outlined">'+
+                                'border_color'+
+                            '</span>'+
+                            '</div>'+
+                            '<div class="item-price">'+value.product.price+' đ</div>'+
+                        '</li>';  
+                        item.innerHTML += html;
+
+                    })  
+                }); 
+                let editList = document.querySelectorAll(".card-body .item");
+                editList.forEach((item,index)=>item.addEventListener("click",function(){
+                    const productObject = productList.find(x=> x.productName === item.querySelector(".item-info .item-name").innerText)
+                    showChildPopup(0, productObject);
+                }));
+
+            }else
+                //cart empty
+                cartBody.forEach((item)=>{
+                    item.innerHTML = 
+                    '<li class="item">'+
+                        '<div class="item-info empty-cart">'+
+                            '<img class="blank-cart-img" src="/asset/img/icon_cart_blank.svg"></img>'+
+                            '<span class="item-name">Giỏ hàng của bạn chưa có sản phẩm nào</span>'+
+                        '</div>'+
+                    '</li>'; 
+                });
+            
+        }
+        else{            
+        //if data not available, get data from session           
+        
+            $.ajax({
+                url:"/cart/getlist",
+                method:"get",
+                contentType:"application/json",
+
+            }).done(function(result){
+                if(result.status)
+                    renderCartBody(result.data);
+            }).fail(function(){
+                 console.log("get list cart from session cart failed");
+            });           
+        
+        }    
+    }
+    //product quantity control
+    function quantityControl(){
+        const quantity = document.querySelector(".quantity-control .quantity");
+        const plus = document.querySelector(".quantity-control .plus");
+        const sub = document.querySelector(".quantity-control .sub");
+        plus.addEventListener("click",()=>{
+            quantity.innerHTML = quantity.innerHTML * 1 + 1;
+        })
+        sub.addEventListener("click",()=>{
+            if(1*quantity.innerHTML - 1 >= 0)
+                quantity.innerHTML = quantity.innerHTML * 1 -1;
+        })
+    }
+    //remove all product in session cart
+    function removeCart(){
+        $.ajax({
+            url:'/cart/delete',
+            method:"delete",
+            
+        }).done(function(result){
+            renderCartBody();
+        }).fail(function(){
+            console.log("remove session cart failed");
+        })
+    }
+    //order
+    function saveOrder(){
+        //let orderItems = [];
+        //let cartBodyNode = document.querySelectorAll(".card-item.card-body")[0];
+        //if(!cartBodyNode.querySelector(".empty-cart")){
+        //    document.querySelectorAll(".card-item.card-body .item")[0].forEach((item, index)=>{
+            
+        //}
+        
+
+        /*public int Id { get; set; }
+        public int? OrderId { get; set; }
+        public int? ProductId { get; set; }
+        public string? Note { get; set; }
+        public int? Quantity { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string? CreatedBy { get; set; }
+        public string? ModifiedBy { get; set; }
+
+        public virtual Order? Order { get; set; }
+        public virtual Product? Product { get; set; } */
+        order.shippingCost = document.querySelector(".checkout-action .ship-cost .money").textContent;
+        order.totalAmount = document.querySelector(".checkout-action .total .money").textContent;
+        order.customerName = document.querySelector(".checkout-action .total .money").textContent;
+        order.customerPhone = document.querySelector(".checkout-action .total .money").textContent;
+        order.customerAddress = document.querySelector(".checkout-action .total .money").textContent;
+        order.orderNote = document.querySelector(".checkout-item.note textarea").value;
+        order.status = "pending";
+            /*
+            public double? ShippingCost { get; set; }
+            public double? TotalAmount { get; set; }
+            public double? DiscountAmount { get; set; }
+            public string? CustomerName { get; set; }
+            public string? CustomerPhone { get; set; }
+            public string? CustomerAddress { get; set; }
+            public string? OrderNote { get; set; }
+            public string? Status { get; set; }
+            */ 
+        //})
+    }
+    
+    function changeCusomterInfo(){
+        const editPopup = document.getElementById("edit-popup");
+        if(editPopup){
+            if(editPopup.classList.contains("d-none"))
+                editPopup.classList.toggle("d-none");
+        
+            editPopup.innerHTML = 
+            '<div class="child-popup"> '+   
+            '<div class="popup customer-info">'+  
+                '<div class="title"><span class="close material-symbols-outlined">arrow_back</span> Thông tin khách hàng </div>'+  
+                '<div class="info-form">'+  
+                    '<div class="form-group">'+  
+                        '<div class="label">Tên người nhận</div>'+  
+                        '<input id="name" placeholder="Tên người nhận"/>'+  
+                    '</div>'+  
+                    '<div class="form-group">'+  
+                        '<div class="label">Số điện thoại</div>'+  
+                        '<input id="phone" placeholder="Số điện thoại"/>'+  
+                    '</div>'+  
+                    '<div class="form-group" id="address">'+  
+                        '<div class="label">Địa chỉ</div>'+  
+                        '<input  placeholder="Địa chỉ nhận hàng, số nhà, tên đường,..."/>'+  
+                        '<ul class="suggestion d-none"></ul>'+
+                    '</div>'+  
+                '</div>'+  
+                '<div id="save-user-info"><button class="btn btn-warning">Xác nhận</button></div>'+  
+            '</div>'+  
+        '</div>';
+        }
+        //auto map address 
+        let inputAddress = document.querySelector("#address input");
+        let addressValue;
+        let position ={};
+        inputAddress.addEventListener("change", function() {
+             addressValue = this.value;
+            $.ajax({
+                url: "https://autocomplete.search.hereapi.com/v1/autocomplete?limit=4" +
+                    "&at=10.989806973433566,106.65397659742058" +
+                    "&lang=vn" +
+                    "&q=" + addressValue +
+                    "&apikey=HAnav97dbllnWK-Qfehi949sMXJvLr125JX0MgPngmw",
+                method: "get",
+                dataType: "json",
+            }).done((result) => {                                          
+                //render suggestions
+                let value="";
+                let html = '<li class="address-item">' +
+                    '<span class="address-icon material-symbols-outlined">pin_drop</span>' +
+                    '<div class="address-value">';
+                const renderSuggestTo = document.querySelector("#address .suggestion");
+                renderSuggestTo.innerHTML = "";
+                for (let i = 0; i < result.items.length; i++) {
+                    value = result.items[i].address.label;
+                    renderSuggestTo.innerHTML += html + value + '</div></li>';
+                }
+                renderSuggestTo.classList.toggle("d-none");
+                    renderSuggestTo.childNodes.forEach((item, index) => {
+                        item.addEventListener("click", () => {
+                            inputAddress.value = item.lastChild.innerHTML;
+                            renderSuggestTo.classList.toggle("d-none");
+                    });
+                })
+            }).fail((error) => {
+                console.log(error);
+            });
+        })
+
+        //set user info
+        document.getElementById("save-user-info").addEventListener("click",function(){
+            let customerInfo = document.querySelector(".customer-address .title");            
+            let customerAddress = document.querySelector(".customer-address  .location");
+            customerAddress.innerText =  document.querySelector(".popup.customer-info #address input").value;
+            order.customerName =  document.querySelector(".popup.customer-info input#name").value;
+            order.customerPhone =  document.querySelector(".popup.customer-info input#phone").value;
+            order.customerAddress = customerAddress.innerText;
+            customerInfo.innerText = order.customerName + " - " +order.customerPhone;
+            this.parentElement.parentElement.parentElement.classList.toggle("d-none");
+            //check valid info
+            if (typeof order.customerAddress !== 'undefined' && order.customerAddress) {
+                //get delivery distance
+                $.ajax({
+                    url: "https://discover.search.hereapi.com/v1/discover" +
+                        "?at=10.989806973433566,106.65397659742058" +
+                        "&lang=vn" +
+                        "&q=" + order.customerAddress +
+                        "&apikey=HAnav97dbllnWK-Qfehi949sMXJvLr125JX0MgPngmw",
+                    method: "get",
+                    dataType: "json",
+                }).done((result) => {                
+                    position = result.items[0].position.lat+","+result.items[0].position.lng;
+                    //caculator
+                    $.ajax({
+                        url: "https://router.hereapi.com/v8/routes" +
+                            "?origin=10.989806973433566,106.65397659742058" +                        
+                            "&transportMode=car"+
+                            "&return=summary"+
+                            "&destination="+position+
+                            "&apikey=HAnav97dbllnWK-Qfehi949sMXJvLr125JX0MgPngmw",
+                        method: "get",
+                        dataType: "json",
+                    }).done((result) => {                
+                       distance = (result.routes[0].sections[0].summary.length /1000).toFixed(1);
+                      document.querySelector(".checkout-action .ship-cost .title").innerText = "Phí vận chuyển( "+distance +" km)";
+                    }).fail((error) => {
+                    });       
+                }).fail((error) => {
+                    console.log(error);
+                });            
+            }
+        });    
+    }
+</script>
+@*<script>
+   
+    let sendMail = $.ajax({
+    url:"/order/sendmail",
+    method:"get",   
+    "headers": {
+            "Content-Type": "application/json",
+            "cache-control": "no-cache"
+    }            
+    }).done(function(result){
+        if(result)
+            console.log("send mail successfully");
+    }).fail(function(xhr, status, error){
+        console.log(error);
+    }) 
+</script>*@

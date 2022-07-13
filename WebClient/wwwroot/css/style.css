@@ -1,0 +1,92 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 18px;
+}
+
+.container {
+    width: 100%;
+    height: auto;
+}
+
+ul,
+li {
+    list-style-type: none;
+}
+
+.form {
+    height: auto;
+    width: 500px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1.375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+}
+
+.items-group {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+    .items-group label {
+        font-size: 19px;
+        font-style: normal;
+        color: rgb(48, 68, 105);
+        padding-bottom: 0.3rem;
+    }
+
+    .items-group h1 {
+        margin: unset;
+        text-align: center;
+    }
+
+    .items-group .items {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+        .items-group .items .icons {
+            position: absolute;
+            left: 90%;
+            font-weight: 300;
+        }
+
+        .items-group .items input {
+            height: 44px;
+            padding: 1rem;
+            width: 100%;
+            color: #495057;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+        }
+
+            .items-group .items input[name=submit] {
+                background-color: black;
+                color: aliceblue;
+                font-size: 1.3rem;
+                line-height: 0;
+            }
+
+            .items-group .items input::placeholder {
+                font-size: 0.95rem;
+                font-weight: 400;
+                padding-left: 0.5rem;
+            }
+
+            .items-group .items input:focus {
+                outline: unset;
+                font-size: 0.95rem;
+            }
